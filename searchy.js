@@ -55,27 +55,29 @@ console.timeEnd('dfind');
 
 var slice = Array.prototype.slice;
 
-var cache = [];
+var cache = [], span, els, matches = [];
 _xfind('ma').forEach(function(el){
     slice.call(el.childNodes).filter(function(child){ return child.nodeType === 3; }).forEach(function(tNode){
         //console.log(tNode, tNode.nodeValue);
-        var span = document.createElement('span');
+        span = document.createElement('span');
         span.innerHTML = tNode.nodeValue.replace(/(ma)/g, '<span class="_searchyMatch"><span class="">$1</span></span>');
         el.insertBefore(span, tNode);
         el.removeChild(tNode);
         cache.push({ parent: el, tNode: tNode, span: span });
         //console.log(8, span.querySelectorAll('._searchyMatch'))
-        slice.call(span.querySelectorAll('._searchyMatch')).forEach(function(match){
-            match.style.width = match.offsetWidth;
-            match.style.height = match.offsetHeight;
-            match.childNodes[0].className = '_searchyMatchInner';
-            console.log(1, match, match.childNodes[0]);
-            
+        var els = slice.call(span.querySelectorAll('._searchyMatch'));
+        matches = matches.concat(els);
+        els.forEach(function(match){
+            match.style.width = match.offsetWidth + 'px';
+            match.style.height = match.offsetHeight + 'px';
+            match.childNodes[0].className = '_searchyMatchInner';            
         });
     })    
 });
+console.log(matches);
+matches[0].className += " pop";
 
-var matches = (slice.call(document.getElementsByClassName('_searchyMatch')) || []);
+//var matches = (slice.call(document.getElementsByClassName('_searchyMatch')) || []);
 //console.log(matches);
 
 /*cache.forEach(function(item){
