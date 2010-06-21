@@ -1,5 +1,19 @@
 (function(){
 
+function findPos(obj){
+    var curleft = curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+            
+        }
+        while (obj = obj.offsetParent);
+        
+        return [curleft, curtop];
+    }
+}
+
 // XPath is 5-10 times faster :)
 // Translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
 
@@ -13,6 +27,11 @@ while ((tmp = xres.iterateNext()) && res.push(tmp)) {
 };
 console.log(res);*/
 
+var $ = function(str){
+    return document.getElementById(str);
+};
+
+var bar = $('searchyBar');
 function _xfind(str, caseSensitive){
     var xpath = caseSensitive ? "//*[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'" + str + "')]" : "//*[contains(text(),'" + str + "')]";
     var xres = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
@@ -45,22 +64,29 @@ function rec(element, keyword, stack){
     return stack;
 }
 
+document.addEventListener('webkitAnimationEnd', function(e){
+    e.target.className = e.target.className.replace(/(^|\s+)pop(\s+|$)/g, '$1$2'); 
+}, false);
+
 //xpath is an order of magnitude faster :)
-console.time('xfind');
-console.log(_xfind('mamma', true).length);
-console.timeEnd('xfind');
+
+/*console.log(_xfind('mamma', true).length);
+
 console.time('dfind');
 console.log(_dfind('mamma').length);
-console.timeEnd('dfind');
+console.timeEnd('dfind');*/
 
 var slice = Array.prototype.slice;
+var searchyMatchCounter = $('searchyMatchCounter');
 
-var cache = [], span, els, matches = [];
-_xfind('ma').forEach(function(el){
+console.time('xfind');
+var cache = [], span, els, matches = [], counter = 0;
+_xfind('song').forEach(function(el){
     slice.call(el.childNodes).filter(function(child){ return child.nodeType === 3; }).forEach(function(tNode){
+        //console.log(tNode);
         //console.log(tNode, tNode.nodeValue);
         span = document.createElement('span');
-        span.innerHTML = tNode.nodeValue.replace(/(ma)/g, '<span class="_searchyMatch"><span class="">$1</span></span>');
+        span.innerHTML = tNode.nodeValue.replace(/(song)/g, '<span class="_searchyMatch"><span class="">$1</span></span>');
         el.insertBefore(span, tNode);
         el.removeChild(tNode);
         cache.push({ parent: el, tNode: tNode, span: span });
@@ -74,8 +100,41 @@ _xfind('ma').forEach(function(el){
         });
     })    
 });
-console.log(matches);
+console.timeEnd('xfind');
+//console.log(matches);
+searchyMatchCounter.textContent = matches.length + ' matches';
 matches[0].className += " pop";
+
+$('searchyNext').addEventListener('click', function(e){
+    var el = matches[counter < matches.length - 1 ? ++counter : (counter = 0)];
+    el.className += " pop";
+    window.scrollTo(0, Math.max(findPos(el)[1] - 50, 0));
+    rePos();
+}, false);
+
+$('searchyPrev').addEventListener('click', function(e){
+    var el = matches[counter > 0 ? --counter : (counter = matches.length - 1)];
+    el.className += " pop";
+    window.scrollTo(0, Math.max(findPos(el)[1] - 50, 0));
+    rePos();
+}, false);
+
+document.addEventListener('scroll', rePos, false);
+document.addEventListener('touchmove', function(e){
+    bar.style.display = 'none';
+}, false);
+document.addEventListener('touchend', function(e){
+    var y = window.pageYOffset;
+    setTimeout(function(){
+        if(y == window.pageYOffset){
+            bar.style.display = 'block';
+        }
+    }, 100);
+});
+function rePos(e){
+    bar.style.webkitTransform = 'translate3d(0px, ' + window.pageYOffset + 'px, 0px)';
+    bar.style.display = 'block';
+}
 
 //var matches = (slice.call(document.getElementsByClassName('_searchyMatch')) || []);
 //console.log(matches);
