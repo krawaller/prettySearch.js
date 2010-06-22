@@ -80,10 +80,7 @@ function rec(element, keyword, stack){
  * @param {Object} e
  */
 searchField.addEventListener('keyup', function(e){
-    var val = this.value;
-    if(this.value.length > 1){
-        find(this.value);    
-    }
+    find(this.value);
 }, false);
 
 
@@ -97,14 +94,16 @@ document.addEventListener('webkitAnimationEnd', function(e){
 
 /**
  * Jump to next occurrence
- * @param {Object} e
+ * @param {Object} i
  */
-$('searchyNext').addEventListener('click', function(e){
-    var el = matches[counter < matches.length - 1 ? ++counter : (counter = 0)];
+function searchyNext(i){
+    var el = matches[typeof i != 'undefined' ? (counter = i) : (counter < matches.length - 1 ? ++counter : (counter = 0))];
     el.className += " pop";
-    window.scrollTo(0, Math.max(findPos(el)[1] - 50, 0));
+    window.scrollTo(0, Math.max((findPos(el) || [0,0])[1] - 50, 0));
     rePos();
-}, false);
+}
+
+$('searchyNext').addEventListener('click', function(){ searchyNext(); }, false);
 
 /**
  * Jump to previous occurrence
@@ -155,55 +154,67 @@ function rePos(e){
 
 var cache = [], span, els, matches, counter;
 function find(str){
-
+    var parent;
+    slice.call(document.getElementsByClassName('_searchyMatch')).forEach(function(el){
+        parent = el.parentNode;
+        parent.insertBefore(document.createTextNode(el.textContent), el);
+        parent.removeChild(el);
+        parent.normalize();    
+    }); 
+    
+    if(str.length < 2){
+        return;
+    }
     console.time('xfind');
-    cache.forEach(function(item){
-        item.parent.insertBefore(item.tNode, item.span);
-        item.parent.removeChild(item.span);    
-    });
-    cache = [];
     matches = [];
     counter = 0;
     
-    _xfind(str).forEach(function(el){
-        slice.call(el.childNodes).filter(function(child){
+    var els = _xfind(str), filtered;
+    for(var i = 0, el; el = els[i++];){
+        filtered = slice.call(el.childNodes).filter(function(child){
             return child.nodeType === 3;
-        }).forEach(function(tNode){
-            //console.log(tNode);
-            //console.log(tNode, tNode.nodeValue);
+        });
+        
+        for(var j = 0, tNode; tNode = filtered[j++];){
             span = document.createElement('span');
-            span.innerHTML = tNode.nodeValue.replace(new RegExp("("+str+")", "g"), '<span class="_searchyMatch"><span class="">$1</span></span>');
+            
             el.insertBefore(span, tNode);
             el.removeChild(tNode);
-            cache.push({
-                parent: el,
-                tNode: tNode,
-                span: span
-            });
-            //console.log(8, span.querySelectorAll('._searchyMatch'))
-            var els = slice.call(span.querySelectorAll('._searchyMatch'));
-            matches = matches.concat(els);
-            els.forEach(function(match){
-                match.style.width = match.offsetWidth + 'px';
-                match.style.height = match.offsetHeight + 'px';
-                match.childNodes[0].className = '_searchyMatchInner';
-            });
-        })
-    });
+            
+            var re = new RegExp("("+str+")", "g"), 
+                match, 
+                s = tNode.nodeValue, 
+                idx = 0,
+                t, m, c;
+                
+            while((match = re.exec(s))){
+                t = document.createTextNode(s.substring(idx, re.lastIndex - match[1].length));
+                m = document.createElement('span');
+                m.className = '_searchyMatch';
+                c = document.createElement('span');
+                c.textContent = match[1];
+                m.appendChild(c);
+                idx = re.lastIndex;
+                
+                span.appendChild(t);
+                span.appendChild(m);
+                
+                m.style.width = m.offsetWidth + 'px';
+                m.style.height = m.offsetHeight + 'px';
+                c.className = '_searchyMatchInner';
+                matches.push(m);
+            }
+            span.appendChild(document.createTextNode(s.substring(idx)));
+        }
+    }
     console.timeEnd('xfind');
-    //console.log(matches);
+
     searchyMatchCounter.textContent = matches.length + ' matches';
-    matches[0].className += " pop";
+    searchyNext(0);
     
+    /*if (matches.length) {
+        matches[0].className += " pop";
+    }*/    
 }
-//find('song');
-
-//var matches = (slice.call(document.getElementsByClassName('_searchyMatch')) || []);
-//console.log(matches);
-
-/*cache.forEach(function(item){
-    item.parent.insertBefore(item.tNode, item.span);
-    item.parent.removeChild(item.span);    
-});*/
 
 })();
