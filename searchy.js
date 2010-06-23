@@ -23,9 +23,6 @@ function findPos(obj){
     }
 }
 
-// XPath is 5-10 times faster :)
-// Translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
-// Cache DOM elements
 var $ = function(str){
     return document.getElementById(str);
 };
@@ -53,12 +50,13 @@ if(!$('searchyBar')){
         '<div id="searchyMatchCounter">Hittades inte</div>',
     '</div>'].join("\n");
     document.body.insertBefore(wrapper, document.body.firstChild);
+} else {
+    isHidden = false;
 }
 
+var isHidden = false;
 var bar = $('searchyBar');
-bar.style.width = document.body.offsetWidth + 'px';
 var wrapper = bar.parentNode;
-
 bar.style.display = 'block';
 
 var searchyMatchCounter = $('searchyMatchCounter');
@@ -113,6 +111,7 @@ function dfind(str){
 searchyDoneButton.addEventListener('click', function(){
     clearSearch();
     bar.style.display = 'none';
+    isHidden = true;
 }, false);
 
 /**
@@ -168,6 +167,7 @@ if(iOS){
  * @param {Object} e
  */
 document.addEventListener('touchmove', function(e){
+    if(isHidden){ return; }
     bar.style.display = 'none';
 }, false);
 
@@ -176,6 +176,7 @@ document.addEventListener('touchmove', function(e){
  * @param {Object} e
  */
 document.addEventListener('touchend', function(e){
+    if(isHidden){ return; }
     var y = window.pageYOffset;
     setTimeout(function(){
         if(y == window.pageYOffset){
@@ -189,7 +190,7 @@ document.addEventListener('touchend', function(e){
  * @param {Object} e
  */
 function rePos(e){
-    if (iOS) {
+    if (!isHidden && iOS) {
         var x = 0;
         bar.style.webkitTransform = 'translate3d(' + x + 'px, ' + window.pageYOffset + 'px, 0px)';
         bar.style.display = 'block';
