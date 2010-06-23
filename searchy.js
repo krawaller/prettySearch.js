@@ -36,7 +36,7 @@ if(!$('searchyBar')){
     var s = document.createElement('link');
     s.rel = 'stylesheet';
     s.media = 'all';
-    s.href = 'searchy.css';
+    s.href = 'http://79.99.1.153/prettySearch.js/searchy.css';
     (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
     
     var wrapper = document.createElement('div');
