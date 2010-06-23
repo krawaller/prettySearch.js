@@ -21,6 +21,7 @@ html {
     line-height: 24px;
     font-family: Lucida Grande, Helvetica;
     position: fixed;
+    z-index: 9999;
 }
 
 #searchyBar > * {
@@ -87,8 +88,7 @@ html {
 .pop {
     -webkit-animation: pop 0.2s ease-in-out;
 }
-
-            
+     
 @-webkit-keyframes pop {
   from { -webkit-transform: scale(1); }
   50%  { -webkit-transform: scale(1.3); }

@@ -4,6 +4,7 @@
 
 var iOS = /iPod|iPhone/.test(navigator.userAgent);
 
+
 /**
  * PPK's utility functions
  * @param {Object} obj
@@ -31,25 +32,35 @@ var $ = function(str){
 };
 var slice = Array.prototype.slice;
 
+if(!$('searchyBar')){
+    var s = document.createElement('link');
+    s.rel = 'stylesheet';
+    s.media = 'all';
+    s.href = 'searchy.css';
+    (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
+    
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = ['<div id="searchyBar">',
+        '<button id="searchyDoneButton">Klar</button>',
+        '<div id="searchySearchFieldWrapper">',
+            '<img id="searchySearchIcon" width="10" height="10" title="" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAABBklEQVQYGXVQsUoDURCcuRcDYmHlN/gBihAbq4CFKAh+g6Yyh5WolRHBJoIWKv7BiUUgIKSSWNkGglYWKfMBwsllnT14IRZus29mZ3fnLaFoHJ4uM+DaiBqMBWBvPzmaj7etL697sHF0tkKzvgMDOiSCgdtC35O8WL+/uRx6rSLiyshQTLD60D4fOHmQnqwxSfphrtIS3HUu0ZgNmD1FkZN37Yt3wjp61h17aKL2E1XPs2FWcnnkEhCv7sm9RnK/eVxT96Zs9SI3/Yz7pKFrsOAiQhMNvfHoYyvLslz473kkrmpLV2daVK7L/8t49LlTCuP42byXpvNLXHguLUj8r9CbpmK9fwHbJF6o5mo3KAAAAABJRU5ErkJggg==" />',
+            '<input type="search" placeholder="search" id="searchySearchField" autocorrect="off" autocomplete="off" />',
+        '</div>',
+        '<div id="searchyMatchNavigation">',
+            '<button id="searchyPrev">◂</button><button id="searchyNext">◂</button>',
+        '</div>',
+        '<div id="searchyMatchCounter">Hittades inte</div>',
+    '</div>'].join("\n");
+    document.body.insertBefore(wrapper, document.body.firstChild);
+}
+
 var bar = $('searchyBar');
+bar.style.display = 'block';
+
 var searchyMatchCounter = $('searchyMatchCounter');
 var searchField = $('searchySearchField');
+var searchyDoneButton = $('searchyDoneButton');
 
-
-/**
- * Finds all occurrences of a string, be it case sensitive or not
- * @param {Object} str
- * @param {Object} caseSensitive
- */
-function _xfind(str, caseSensitive){
-    var xpath = caseSensitive ? "//*[contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'" + str + "')]" : "//*[contains(text(),'" + str + "')]";
-    var xres = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-    var tmp, res = [];
-    while ((tmp = xres.iterateNext())) {
-        res.push(tmp);
-    };
-    return res;
-}
 
 var re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\S\s]*$/;
 /**
@@ -58,7 +69,8 @@ var re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\
  */ 
 function dfind(str){
     var reOpts;
-    console.log(str.match(rematchRe));
+
+    // Regexpify if applicable
     if(reOpts = str.match(rematchRe)){
         var reStr = reOpts[1];
         if(!hasSubGroup.test(reStr)){
@@ -69,8 +81,11 @@ function dfind(str){
         if(modifiers.indexOf("g") == -1){
             modifiers.push("g");
         }
-        
-        re = new RegExp(reStr, modifiers.join(""));
+        try {
+            re = new RegExp(reStr, modifiers.join(""));
+        } catch(e){
+            return [];
+        }
     } else {
         re = new RegExp("("+str+")", "gi");
     }
@@ -89,40 +104,15 @@ function dfind(str){
     return matches;
 }
 
-/**
- * Finds all occurrences of a string
- * @param {Object} str
- */
-function _dfind(str){
-    return rec(document.body, str, []);
-}
-
-/**
- * Helper function to recursively find all elements matching a certain string
- * @param {Object} str
- * @param {Object} caseSensitive
- */
-function rec(element, keyword, stack){
-    if (element) {
-        if (element.nodeType == 3) {
-            if (element.nodeValue.indexOf(keyword) != -1) {
-                stack.push(element.parentNode);
-            }
-        }
-        else 
-            if (element.nodeName.toLowerCase() != 'select') {
-                for (var i = element.childNodes.length - 1; i >= 0; i--) {
-                    rec(element.childNodes[i], keyword, stack);
-                }
-            }
-    }
-    return stack;
-}
-
 /* Bind events */
 
+searchyDoneButton.addEventListener('click', function(){
+    clearSearch();
+    bar.style.display = 'none';
+}, false);
+
 /**
- * Perform search upon keydown
+ * Perform search upon keyup
  * @param {Object} e
  */
 searchField.addEventListener('keyup', function(e){
@@ -164,7 +154,6 @@ $('searchyPrev').addEventListener('click', function(e){
 /**
  * Reposition bar upon scrolling if iOS - how to feature detect?
  */
-
 if(iOS){
     document.addEventListener('scroll', rePos, false);
 }
@@ -191,7 +180,7 @@ document.addEventListener('touchend', function(e){
 });
 
 /**
- * Actual repositioning function
+ * Actual searchyBar repositioning function
  * @param {Object} e
  */
 function rePos(e){
@@ -224,6 +213,10 @@ function chunk(array, process, context, i, funcs){
 }
 
 var str;
+/**
+ * Find all occurrences of the RegExpified string in a text node and highlight them 
+ * @param {Object} tNode
+ */
 function findNodeOccurrences(tNode){
     var el = tNode.parentNode;
     if(!el){ console.log('Error', tNode, el); return; } //Hum
@@ -258,9 +251,10 @@ function findNodeOccurrences(tNode){
     searchyMatchCounter.textContent = matches.length + ' matches';
 }
 
-var cache = [], span, els, matches, counter;
-function find(_str){
-    str = _str;
+/**
+ * Clear all traces of a search
+ */
+function clearSearch(){
     var parent;
     slice.call(document.getElementsByClassName('_searchyMatch')).forEach(function(el){
         parent = el.parentNode;
@@ -269,6 +263,7 @@ function find(_str){
         parent.normalize();    
     });
     searchyMatchCounter.textContent = 'No matches';
+    
     if(timeoutOuter){
         clearTimeout(timeoutOuter);
     } 
@@ -276,12 +271,19 @@ function find(_str){
         clearTimeout(timeoutInner);
     }
     
+    counter = 0;
+    matches = [];
+}
+
+var cache = [], span, els, matches, counter;
+function find(_str){
+    if(_str === str){ return; }
+    str = _str;
+    
+    clearSearch();
     if(str.length < 2){
         return;
     }
-
-    counter = 0;
-    matches = [];
     
     var els = dfind(str);
     if(!els.length){ return; }
