@@ -1,5 +1,13 @@
 (function(){
 
+//TODO: use text nodes directly from *find
+
+var iOS = /iPod|iPhone/.test(navigator.userAgent);
+
+/**
+ * PPK's utility functions
+ * @param {Object} obj
+ */
 function findPos(obj){
     var curleft = curtop = 0;
     if (obj.offsetParent) {
@@ -43,6 +51,44 @@ function _xfind(str, caseSensitive){
     return res;
 }
 
+var re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\S\s]*$/;
+/**
+ * Find textNodes containing str
+ * @param {String} str
+ */ 
+function dfind(str){
+    var reOpts;
+    console.log(str.match(rematchRe));
+    if(reOpts = str.match(rematchRe)){
+        var reStr = reOpts[1];
+        if(!hasSubGroup.test(reStr)){
+            reStr = "(" + reStr + ")";
+        }
+        
+        var modifiers = reOpts[2].split("");
+        if(modifiers.indexOf("g") == -1){
+            modifiers.push("g");
+        }
+        
+        re = new RegExp(reStr, modifiers.join(""));
+    } else {
+        re = new RegExp("("+str+")", "gi");
+    }
+    
+    var els = document.body.getElementsByTagName("*");
+    var matches = [];
+    var tNodes = [];
+    for(var i = 0, el; el = els[i++];){
+        for(var j = 0, children = el.childNodes, child; child = children[j++];){
+            re.lastIndex = 0;
+            if(child.nodeType === 3 && re.test(child.nodeValue)){
+                matches.push(child);
+            }
+        }
+    }
+    return matches;
+}
+
 /**
  * Finds all occurrences of a string
  * @param {Object} str
@@ -83,7 +129,6 @@ searchField.addEventListener('keyup', function(e){
     find(this.value);
 }, false);
 
-
 /**
  * Remove pop class upon animation end
  * @param {Object} e
@@ -92,6 +137,7 @@ document.addEventListener('webkitAnimationEnd', function(e){
     e.target.className = e.target.className.replace(/(^|\s+)pop(\s+|$)/g, '$1$2'); 
 }, false);
 
+// TODO: merge step funcs
 /**
  * Jump to next occurrence
  * @param {Object} i
@@ -102,7 +148,6 @@ function searchyNext(i){
     window.scrollTo(0, Math.max((findPos(el) || [0,0])[1] - 50, 0));
     rePos();
 }
-
 $('searchyNext').addEventListener('click', function(){ searchyNext(); }, false);
 
 /**
@@ -117,9 +162,12 @@ $('searchyPrev').addEventListener('click', function(e){
 }, false);
 
 /**
- * Reposition bar upon scrolling
+ * Reposition bar upon scrolling if iOS - how to feature detect?
  */
-document.addEventListener('scroll', rePos, false);
+
+if(iOS){
+    document.addEventListener('scroll', rePos, false);
+}
 
 /**
  * Hide bar upon scroll start
@@ -147,74 +195,105 @@ document.addEventListener('touchend', function(e){
  * @param {Object} e
  */
 function rePos(e){
-    bar.style.webkitTransform = 'translate3d(0px, ' + window.pageYOffset + 'px, 0px)';
-    bar.style.display = 'block';
+    if (iOS) {
+        bar.style.webkitTransform = 'translate3d(0px, ' + window.pageYOffset + 'px, 0px)';
+        bar.style.display = 'block';
+    }
 }
 
+/**
+ * Chunker from NCZ-online
+ * @param {Object} array
+ * @param {Object} process
+ * @param {Object} context
+ */
+var tmp, timeoutOuter, timeoutInner;
+function chunk(array, process, context, i, funcs){
+    timeoutOuter = setTimeout(function(){
+        var item = array.shift();
+        process.call(context, item);
+
+        if (array.length > 0){
+            timeoutInner = setTimeout(arguments.callee, 0);
+        }
+        
+        if(tmp = funcs[i++]){
+            tmp();
+        }
+    }, 0);
+}
+
+var str;
+function findNodeOccurrences(tNode){
+    var el = tNode.parentNode;
+    if(!el){ console.log('Error', tNode, el); return; } //Hum
+    span = document.createElement('span');
+            
+    el.insertBefore(span, tNode);
+    el.removeChild(tNode);
+    
+    var match, 
+        s = tNode.nodeValue, 
+        idx = 0,
+        t, m, c;
+        
+    while((match = re.exec(s))){
+        t = document.createTextNode(s.substring(idx, re.lastIndex - match[1].length));
+        m = document.createElement('span');
+        m.className = '_searchyMatch';
+        c = document.createElement('span');
+        c.textContent = match[1];
+        m.appendChild(c);
+        idx = re.lastIndex;
+        
+        span.appendChild(t);
+        span.appendChild(m);
+        
+        m.style.width = m.offsetWidth + 'px';
+        m.style.height = m.offsetHeight + 'px';
+        c.className = '_searchyMatchInner';
+        matches.push(m);
+    }
+    span.appendChild(document.createTextNode(s.substring(idx)));
+    searchyMatchCounter.textContent = matches.length + ' matches';
+}
 
 var cache = [], span, els, matches, counter;
-function find(str){
+function find(_str){
+    str = _str;
     var parent;
     slice.call(document.getElementsByClassName('_searchyMatch')).forEach(function(el){
         parent = el.parentNode;
         parent.insertBefore(document.createTextNode(el.textContent), el);
         parent.removeChild(el);
         parent.normalize();    
-    }); 
+    });
+    searchyMatchCounter.textContent = 'No matches';
+    if(timeoutOuter){
+        clearTimeout(timeoutOuter);
+    } 
+    if(timeoutInner){
+        clearTimeout(timeoutInner);
+    }
     
     if(str.length < 2){
         return;
     }
-    console.time('xfind');
-    matches = [];
-    counter = 0;
-    
-    var els = _xfind(str), filtered;
-    for(var i = 0, el; el = els[i++];){
-        filtered = slice.call(el.childNodes).filter(function(child){
-            return child.nodeType === 3;
-        });
-        
-        for(var j = 0, tNode; tNode = filtered[j++];){
-            span = document.createElement('span');
-            
-            el.insertBefore(span, tNode);
-            el.removeChild(tNode);
-            
-            var re = new RegExp("("+str+")", "g"), 
-                match, 
-                s = tNode.nodeValue, 
-                idx = 0,
-                t, m, c;
-                
-            while((match = re.exec(s))){
-                t = document.createTextNode(s.substring(idx, re.lastIndex - match[1].length));
-                m = document.createElement('span');
-                m.className = '_searchyMatch';
-                c = document.createElement('span');
-                c.textContent = match[1];
-                m.appendChild(c);
-                idx = re.lastIndex;
-                
-                span.appendChild(t);
-                span.appendChild(m);
-                
-                m.style.width = m.offsetWidth + 'px';
-                m.style.height = m.offsetHeight + 'px';
-                c.className = '_searchyMatchInner';
-                matches.push(m);
-            }
-            span.appendChild(document.createTextNode(s.substring(idx)));
-        }
-    }
-    console.timeEnd('xfind');
 
-    searchyMatchCounter.textContent = matches.length + ' matches';
-    searchyNext(0);
+    counter = 0;
+    matches = [];
     
-    /*if (matches.length) {
-        matches[0].className += " pop";
-    }*/    
+    var els = dfind(str);
+    if(!els.length){ return; }
+    
+    els.splice(100); // Too many
+    
+    var fns = {};
+    fns[0] = function(){
+        searchyNext(0);    
+    };
+    
+    chunk(els, findNodeOccurrences, null, 0, fns);
 }
 
 })();
