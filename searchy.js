@@ -1,9 +1,6 @@
 (function(){
 
-//TODO: use text nodes directly from *find
-
 var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent);
-
 
 /**
  * PPK's utility functions
@@ -63,6 +60,9 @@ var searchyMatchCounter = $('searchyMatchCounter');
 var searchField = $('searchySearchField');
 var searchyDoneButton = $('searchyDoneButton');
 
+if(!iOS){
+    bar.style.position = 'fixed';
+}
 
 var re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\S\s]*$/;
 /**
@@ -191,7 +191,7 @@ document.addEventListener('touchend', function(e){
  */
 function rePos(e){
     if (!isHidden && iOS) {
-        var x = 0;
+        var x = window.pageXOffset + window.innerWidth - 320; //FIXME
         bar.style.webkitTransform = 'translate3d(' + x + 'px, ' + window.pageYOffset + 'px, 0px)';
         bar.style.display = 'block';
     }
