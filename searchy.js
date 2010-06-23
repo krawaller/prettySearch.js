@@ -2,7 +2,7 @@
 
 //TODO: use text nodes directly from *find
 
-var iOS = /iPod|iPhone/.test(navigator.userAgent);
+var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent);
 
 
 /**
@@ -35,7 +35,8 @@ if(!$('searchyBar')){
     var s = document.createElement('link');
     s.rel = 'stylesheet';
     s.media = 'all';
-    s.href = 'http://79.99.1.153/prettySearch.js/searchy.css';
+    //s.href = 'http://79.99.1.153/prettySearch.js/searchy.css';
+    s.href = "searchy.css";
     (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
     
     var wrapper = document.createElement('div');
@@ -188,12 +189,9 @@ document.addEventListener('touchend', function(e){
  * @param {Object} e
  */
 function rePos(e){
-    //console.log(['hej', document.documentElement.offsetWidth, bar.offsetWidth, bar.style.width, window.innerWidth, window.pageXOffset, window.pageYOffset]);
     if (iOS) {
-        //wrapper.style.webkitTransform = 'scale(2)';
-        //var scale = window.innerWidth / 320;
-        //console.log(scale);
-        //bar.style.webkitTransform = 'scale(' + scale + ') translate3d(' + (window.pageXOffset + window.innerWidth - parseInt(bar.style.width))/scale + 'px, ' + window.pageYOffset/scale + 'px, 0px)';
+        var x = 0;
+        bar.style.webkitTransform = 'translate3d(' + x + 'px, ' + window.pageYOffset + 'px, 0px)';
         bar.style.display = 'block';
     }
 }

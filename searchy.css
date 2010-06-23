@@ -4,7 +4,7 @@ html {
 
 #searchyWrapper {
     position: absolute;
-    -webkit-transform-origin: 0 0;
+    -webkit-transform-origin: 1 1;
 }
 
 #searchyBar * {
