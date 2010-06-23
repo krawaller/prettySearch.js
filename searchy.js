@@ -44,7 +44,7 @@ if(!$('searchyBar')){
             '<input type="search" placeholder="search" id="searchySearchField" autocorrect="off" autocomplete="off" />',
         '</div>',
         '<div id="searchyMatchNavigation">',
-            '<button id="searchyPrev">◂</button><button id="searchyNext">◂</button>',
+            '<button id="searchyPrev">\u25c2</button><button id="searchyNext">\u25c2</button>',
         '</div>',
         '<div id="searchyMatchCounter">Hittades inte</div>',
     '</div>'].join("\n");
