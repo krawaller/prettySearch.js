@@ -155,7 +155,9 @@ document.addEventListener('webkitAnimationEnd', function(e){
 function searchyNext(i){
     var el = matches[typeof i != 'undefined' ? (counter = i) : (counter < matches.length - 1 ? ++counter : (counter = 0))];
     el.className += " pop";
-    window.scrollTo(0, Math.max((findPos(el) || [0,0])[1] - 50, 0));
+    var pos = findPos(el);
+    if(!pos){ return };
+    window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
 }
 $('searchyNext').addEventListener('click', function(){ searchyNext(); }, false);
@@ -168,6 +170,7 @@ $('searchyPrev').addEventListener('click', function(e){
     var el = matches[counter > 0 ? --counter : (counter = matches.length - 1)];
     el.className += " pop";
     var pos = findPos(el);
+    if(!pos){ return };
     window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
 }, false);
@@ -321,8 +324,5 @@ function find(_str){
     
     chunk(els, findNodeOccurrences, null, 0, fns);
 }
-
 setTimeout(rePos, 0);
-
-
 })();
