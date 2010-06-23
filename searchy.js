@@ -123,6 +123,14 @@ searchField.addEventListener('keyup', function(e){
 }, false);
 
 /**
+ * Clear searchField upon click
+ * @param {Object} e
+ */
+searchField.addEventListener('click', function(e){
+    this.value == "";
+}, false);
+
+/**
  * Remove pop class upon animation end
  * @param {Object} e
  */
