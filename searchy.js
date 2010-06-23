@@ -30,11 +30,13 @@ if(!$('searchyBar')){
     s.rel = 'stylesheet';
     s.media = 'all';
     s.href = 'http://79.99.1.153/prettySearch.js/searchy.css';
-
+    
     (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
     
     var wrapper = document.createElement('div');
     wrapper.id = 'searchyWrapper';
+    wrapper.style.display = 'none';
+    
     wrapper.innerHTML = ['<div id="searchyBar">',
         '<button id="searchyDoneButton">Klar</button>',
         '<div id="searchySearchFieldWrapper">',
@@ -47,6 +49,13 @@ if(!$('searchyBar')){
         '<div id="searchyMatchCounter">Hittades inte</div>',
     '</div>'].join("\n");
     document.body.insertBefore(wrapper, document.body.firstChild);
+    
+    var interval = setInterval(function(){
+        if(window.getComputedStyle(document.documentElement, null)['padding-top'] == '32px'){
+            wrapper.style.display = 'block';
+            clearInterval(interval);
+        }
+    }, 40);
 } else {
     isHidden = false;
 }
