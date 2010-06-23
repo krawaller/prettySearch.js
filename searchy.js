@@ -313,6 +313,7 @@ function find(_str){
     chunk(els, findNodeOccurrences, null, 0, fns);
 }
 
-rePos();
+setTimeout(rePos, 0);
+
 
 })();
