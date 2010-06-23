@@ -127,7 +127,7 @@ searchField.addEventListener('keyup', function(e){
  * @param {Object} e
  */
 searchField.addEventListener('click', function(e){
-    this.value == "";
+    this.value = "";
 }, false);
 
 /**
