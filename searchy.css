@@ -1,6 +1,6 @@
-html {
+/*html {
     padding-top: 32px;
-}
+}*/
 
 #searchyWrapper {
     position: absolute;
@@ -9,7 +9,7 @@ html {
     left: 0px;
 }
 
-#searchyBar * {
+#searchyBar foo {
     -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
@@ -17,7 +17,6 @@ html {
 
 #searchyBar {
     height: 31px;
-    background: #f00;
     position: absolute;
     top: 0px;
     left: 0px;
