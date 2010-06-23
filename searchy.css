@@ -2,6 +2,11 @@ html {
     padding-top: 25px;
 }
 
+#searchyWrapper {
+    position: absolute;
+    -webkit-transform-origin: 0 0;
+}
+
 #searchyBar * {
     -webkit-touch-callout: none; /* prevent callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none; /* prevent webkit from resizing text to fit */

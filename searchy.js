@@ -25,7 +25,6 @@ function findPos(obj){
 
 // XPath is 5-10 times faster :)
 // Translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')
-
 // Cache DOM elements
 var $ = function(str){
     return document.getElementById(str);
@@ -40,6 +39,7 @@ if(!$('searchyBar')){
     (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
     
     var wrapper = document.createElement('div');
+    wrapper.id = 'searchyWrapper';
     wrapper.innerHTML = ['<div id="searchyBar">',
         '<button id="searchyDoneButton">Klar</button>',
         '<div id="searchySearchFieldWrapper">',
@@ -55,6 +55,9 @@ if(!$('searchyBar')){
 }
 
 var bar = $('searchyBar');
+bar.style.width = document.body.offsetWidth + 'px';
+var wrapper = bar.parentNode;
+
 bar.style.display = 'block';
 
 var searchyMatchCounter = $('searchyMatchCounter');
@@ -147,7 +150,8 @@ $('searchyNext').addEventListener('click', function(){ searchyNext(); }, false);
 $('searchyPrev').addEventListener('click', function(e){
     var el = matches[counter > 0 ? --counter : (counter = matches.length - 1)];
     el.className += " pop";
-    window.scrollTo(0, Math.max(findPos(el)[1] - 50, 0));
+    var pos = findPos(el);
+    window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
 }, false);
 
@@ -184,8 +188,12 @@ document.addEventListener('touchend', function(e){
  * @param {Object} e
  */
 function rePos(e){
+    //console.log(['hej', document.documentElement.offsetWidth, bar.offsetWidth, bar.style.width, window.innerWidth, window.pageXOffset, window.pageYOffset]);
     if (iOS) {
-        bar.style.webkitTransform = 'translate3d(0px, ' + window.pageYOffset + 'px, 0px)';
+        //wrapper.style.webkitTransform = 'scale(2)';
+        //var scale = window.innerWidth / 320;
+        //console.log(scale);
+        //bar.style.webkitTransform = 'scale(' + scale + ') translate3d(' + (window.pageXOffset + window.innerWidth - parseInt(bar.style.width))/scale + 'px, ' + window.pageYOffset/scale + 'px, 0px)';
         bar.style.display = 'block';
     }
 }
