@@ -27,13 +27,14 @@ if(!$('searchyBar')){
     s.rel = 'stylesheet';
     s.media = 'all';
     s.href = 'http://79.99.1.153/prettySearch.js/searchy.css';
+    //s.href = 'searchy.css';
     (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
     
     var wrapper = document.createElement('div');
     wrapper.id = 'searchyWrapper';
     wrapper.style.display = 'none';
     wrapper.innerHTML = ['<div id="searchyBar">',
-        '<button id="searchyDoneButton">Done</button>',
+        '<button id="searchyDoneButton" class="_noMatch">Done</button>',
         '<div id="searchySearchFieldWrapper">',
             '<img id="searchySearchIcon" width="10" height="10" title="" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAABBklEQVQYGXVQsUoDURCcuRcDYmHlN/gBihAbq4CFKAh+g6Yyh5WolRHBJoIWKv7BiUUgIKSSWNkGglYWKfMBwsllnT14IRZus29mZ3fnLaFoHJ4uM+DaiBqMBWBvPzmaj7etL697sHF0tkKzvgMDOiSCgdtC35O8WL+/uRx6rSLiyshQTLD60D4fOHmQnqwxSfphrtIS3HUu0ZgNmD1FkZN37Yt3wjp61h17aKL2E1XPs2FWcnnkEhCv7sm9RnK/eVxT96Zs9SI3/Yz7pKFrsOAiQhMNvfHoYyvLslz473kkrmpLV2daVK7L/8t49LlTCuP42byXpvNLXHguLUj8r9CbpmK9fwHbJF6o5mo3KAAAAABJRU5ErkJggg==" />',
             '<input type="search" placeholder="search" id="searchySearchField" autocorrect="off" autocomplete="off" />',
@@ -41,7 +42,7 @@ if(!$('searchyBar')){
         '<div id="searchyMatchNavigation">',
             '<button id="searchyPrev">\u25c2</button><button id="searchyNext">\u25c2</button>',
         '</div>',
-        '<div id="searchyMatchCounter">No matches</div>',
+        '<div id="searchyMatchCounter" class="_noMatch">No matches</div>',
     '</div>'].join("\n");
     document.body.insertBefore(wrapper, document.body.firstChild);
     
@@ -96,10 +97,12 @@ function dfind(str){
         matches = [],
         tNodes = [];
     for(var i = 0, el; el = els[i++];){
-        for(var j = 0, children = el.childNodes, child; child = children[j++];){
-            re.lastIndex = 0;
-            if(child.nodeType === 3 && re.test(child.nodeValue)){
-                matches.push(child);
+        if (el.className.indexOf('_noMatch') == -1) {
+            for (var j = 0, children = el.childNodes, child; child = children[j++];) {
+                re.lastIndex = 0;
+                if (child.nodeType === 3 && re.test(child.nodeValue)) {
+                    matches.push(child);
+                }
             }
         }
     }
@@ -141,33 +144,29 @@ document.addEventListener('webkitAnimationEnd', function(e){
     e.target.className = e.target.className.replace(/(^|\s+)pop(\s+|$)/g, '$1$2'); 
 }, false);
 
-// TODO: merge step funcs
 /**
- * Jump to next occurrence
- * @param {Object} i
+ * Jump to occurrence specified by counter + delta
+ * @param {Object} ds Step delta
  */
-function searchyNext(i){
-    var el = matches[typeof i != 'undefined' ? (counter = i) : (counter < matches.length - 1 ? ++counter : (counter = 0))];
-    el.className += " pop";
-    var pos = findPos(el);
+function searchyStep(ds){
+    var lastEl = matches[counter],
+        i = counter + ds,
+        el = matches[(counter = i < 0 ? i = matches.length - 1 : (i > matches.length - 1 ? 0 : i))],
+        pos = findPos(el);
+    
+    //console.log('el', el, el.parentNode.parentNode);
+    lastEl.className = (lastEl.className || "").replace(/(^|\s+)searchyActive(\s+|$)/g, '$1$2');
+    el.className += " searchyActive";
     if(!pos){ return };
     window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
 }
-$('searchyNext').addEventListener('click', function(){ searchyNext(); }, false);
+$('searchyNext').addEventListener('click', function(){ searchyStep(1); }, false);
 
 /**
  * Jump to previous occurrence
- * @param {Object} e
  */
-$('searchyPrev').addEventListener('click', function(e){
-    var el = matches[counter > 0 ? --counter : (counter = matches.length - 1)];
-    el.className += " pop";
-    var pos = findPos(el);
-    if(!pos){ return };
-    window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
-    rePos();
-}, false);
+$('searchyPrev').addEventListener('click', function(){ searchyStep(-1); }, false);
 
 /**
  * Reposition bar upon scrolling if iOS - how to feature detect?
@@ -197,7 +196,7 @@ document.addEventListener('touchend', function(e){
             bar.style.display = 'block';
         }
     }, 100);
-});
+}, false);
 
 /**
  * Actual searchyBar repositioning function
@@ -312,7 +311,7 @@ function find(_str){
     
     var fns = {};
     fns[0] = function(){
-        searchyNext(0);    
+        searchyStep(0);    
     };
     
     chunk(els, findNodeOccurrences, null, 0, fns);
