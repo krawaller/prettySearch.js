@@ -24,7 +24,7 @@ html {
     background: -webkit-gradient( linear, 0% 0%, 0% 100%, from(#ededed), to(#d9d9d9) );
     border-bottom: 1px solid #8d8d8d;
     border-left: 1px solid #8d8d8d;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 31px;
     font-family: Lucida Grande, Helvetica;
     z-index: 9999;
@@ -33,11 +33,11 @@ html {
 
 #searchyBar > * {
     float: right;
-    margin-right: 6px;
+    margin-right: 5px;
 }
 
 #searchyMatchCounter {
-    font-size: 15px;
+    font-size: 14px;
 }
 
 #searchyDoneButton, #searchyPrev, #searchyNext {
@@ -90,26 +90,45 @@ html {
 }
 
 ._searchyMatch {
-    display: inline-block;
+    display: inline-block !important;
     position: relative;
+    padding: 0 !important;
+}
+
+._searchyMatchWrapper {
+    padding: 0 !important;
+    display: inline-block !important;
+}
+
+._searchyMatchInner, ._searchyMatchSimple {
+    -webkit-border-radius: 7px;
+    -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+._searchyMatchSimple {
+    background: -webkit-gradient( linear, 0% 0%, 0% 100%, from(rgba(212, 212, 212, 0.7)), to(rgba(168, 168, 168, 0.7)) );
+    border: 1px solid rgba(232, 232, 232, 0.7);
+}
+
+.searchyActive._searchyMatchSimple {
+    background: -webkit-gradient( linear, 0% 0%, 0% 100%, from(rgba(244, 234, 38, 0.7)), to(rgba(237, 206, 0, 0.7)) );
+    border: 1px solid rgba(244, 234, 38, 0.8);
 }
 
 ._searchyMatchInner {
-    background: -webkit-gradient( linear, 0% 0%, 0% 100%, from(rgba(244, 234, 38, 0.8)), to(rgba(237, 206, 0, 0.8)) );
-    padding: 2px 4px;
-    position: absolute;
-    top: 1px;
-    left: -4px;
-    -webkit-border-radius: 7px;
     border: 1px solid rgba(244, 234, 38, 0.8);
-    -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6);
-    
+    background: -webkit-gradient( linear, 0% 0%, 0% 100%, from(rgba(244, 234, 38, 0.7)), to(rgba(237, 206, 0, 0.7)) );
+    display: block !important;
+    padding: 3px 5px 2px 5px !important;
+    position: absolute;
+    top: 0px;
+    left: -5px;
     -webkit-transform: scale(1);
     -webkit-transition: -webkit-transform 0.2s ease-in-out;
 }
 
 .searchyActive ._searchyMatchInner {
-    -webkit-transform: scale(1.4);
+    -webkit-transform: scale(1.5);
     z-index: 2337;
 }
             

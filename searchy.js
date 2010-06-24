@@ -1,6 +1,7 @@
 (function(){
 
-var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent);
+var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent),
+    slow = /iPod|iPhone/.test(navigator.userAgent);
 
 /**
  * PPK's utility functions
@@ -57,6 +58,7 @@ if(!$('searchyBar')){
 }
 
 var isHidden = false,
+    scrolling = false,
     bar = $('searchyBar'),
     wrapper = bar.parentNode,
     searchyMatchCounter = $('searchyMatchCounter'),
@@ -181,8 +183,9 @@ if(iOS){
  * @param {Object} e
  */
 document.addEventListener('touchmove', function(e){
-    if(isHidden){ return; }
+    if(isHidden || scrolling){ return; }
     bar.style.display = 'none';
+    scrolling = true;
 }, false);
 
 /**
@@ -195,6 +198,7 @@ document.addEventListener('touchend', function(e){
     setTimeout(function(){
         if(y == window.pageYOffset){
             bar.style.display = 'block';
+            scrolling = false;
         }
     }, 100);
 }, false);
@@ -208,6 +212,7 @@ function rePos(e){
         var x = window.pageXOffset + window.innerWidth - 320; //FIXME
         bar.style.webkitTransform = 'translate3d(' + x + 'px, ' + window.pageYOffset + 'px, 0px)';
         bar.style.display = 'block';
+        scrolling = false;
     }
 }
 
@@ -224,7 +229,7 @@ function chunk(array, process, context, i, funcs){
         process.call(context, item);
 
         if (array.length > 0){
-            timeoutInner = setTimeout(arguments.callee, 0);
+            timeoutInner = setTimeout(arguments.callee, 30);
         }
         
         if(tmp = funcs[i++]){
@@ -245,6 +250,7 @@ function findNodeOccurrences(tNode){
         return; 
     } //Hum
     span = document.createElement('span');
+    span.className = '_searchyMatchWrapper';
             
     el.insertBefore(span, tNode);
     el.removeChild(tNode);
@@ -257,18 +263,42 @@ function findNodeOccurrences(tNode){
     while((match = re.exec(s))){
         t = document.createTextNode(s.substring(idx, re.lastIndex - match[1].length));
         m = document.createElement('span');
-        m.className = '_searchyMatch';
-        c = document.createElement('span');
-        c.textContent = match[1];
-        m.appendChild(c);
-        idx = re.lastIndex;
         
-        span.appendChild(t);
-        span.appendChild(m);
         
-        m.style.width = m.offsetWidth + 'px';
-        m.style.height = m.offsetHeight + 'px';
-        c.className = '_searchyMatchInner';
+        if (slow) {
+            m.className = '_searchyMatchSimple';
+            m.textContent = match[1];
+            
+            span.appendChild(t);
+            span.appendChild(m);
+            
+            idx = re.lastIndex;
+        }
+        else {
+            m.className = '_searchyMatch';
+            c = document.createElement('span');
+            c.textContent = match[1];
+            m.appendChild(c);
+            idx = re.lastIndex;
+            
+            span.appendChild(t);
+            span.appendChild(m);
+            
+            m.style.visibility = 'hidden';
+            m.style.position = 'absolute';
+            m.style.padding = '0px';
+            var before = c.style.padding;
+            c.style.padding = '0px';
+            
+            m.style.width = m.clientWidth + 'px';
+            m.style.height = m.clientHeight + 'px';
+            
+            m.style.visibility = 'visible';
+            m.style.position = 'relative';
+            c.style.padding = before;
+            
+            c.className = '_searchyMatchInner';
+        }
         matches.push(m);
     }
     span.appendChild(document.createTextNode(s.substring(idx)));
