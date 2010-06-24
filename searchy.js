@@ -67,7 +67,7 @@ bar.style.display = 'block';
 
 if(!iOS){ bar.style.position = 'fixed'; }
 
-var re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\S\s]*$/;
+var nogo = ['SCRIPT', 'OPTION', 'STYLE'], re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\S\s]*$/;
 /**
  * Find textNodes containing str
  * @param {String} str
@@ -97,7 +97,7 @@ function dfind(str){
         matches = [],
         tNodes = [];
     for(var i = 0, el; el = els[i++];){
-        if (el.className.indexOf('_noMatch') == -1) {
+        if (nogo.indexOf(el.nodeName) == -1 && el.className.indexOf('_noMatch') == -1) {
             for (var j = 0, children = el.childNodes, child; child = children[j++];) {
                 re.lastIndex = 0;
                 if (child.nodeType === 3 && re.test(child.nodeValue)) {
@@ -149,17 +149,18 @@ document.addEventListener('webkitAnimationEnd', function(e){
  * @param {Object} ds Step delta
  */
 function searchyStep(ds){
+    try {
     var lastEl = matches[counter],
         i = counter + ds,
         el = matches[(counter = i < 0 ? i = matches.length - 1 : (i > matches.length - 1 ? 0 : i))],
         pos = findPos(el);
     
-    //console.log('el', el, el.parentNode.parentNode);
     lastEl.className = (lastEl.className || "").replace(/(^|\s+)searchyActive(\s+|$)/g, '$1$2');
     el.className += " searchyActive";
     if(!pos){ return };
     window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
+    } catch(e){ console.log(['e', e]); }
 }
 $('searchyNext').addEventListener('click', function(){ searchyStep(1); }, false);
 
