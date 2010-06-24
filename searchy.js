@@ -239,7 +239,10 @@ var str;
  */
 function findNodeOccurrences(tNode){
     var el = tNode.parentNode;
-    if(!el){ console.log('Error', tNode, el); return; } //Hum
+    if(!el){
+        //console.log('Error', tNode, el); 
+        return; 
+    } //Hum
     span = document.createElement('span');
             
     el.insertBefore(span, tNode);
