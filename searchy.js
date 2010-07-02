@@ -150,7 +150,6 @@ document.addEventListener('webkitAnimationEnd', function(e){
  * @param {Object} ds Step delta
  */
 function searchyStep(ds){
-    try {
     var lastEl = matches[counter],
         i = counter + ds,
         el = matches[(counter = i < 0 ? i = matches.length - 1 : (i > matches.length - 1 ? 0 : i))],
@@ -161,7 +160,6 @@ function searchyStep(ds){
     if(!pos){ return };
     window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
-    } catch(e){ console.log(['e', e]); }
 }
 $('searchyNext').addEventListener('click', function(){ searchyStep(1); }, false);
 
