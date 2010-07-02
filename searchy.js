@@ -1,7 +1,6 @@
 (function(){
 
-var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent),
-    slow = /iPod|iPhone/.test(navigator.userAgent);
+var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent);
 
 /**
  * PPK's utility functions
@@ -157,8 +156,8 @@ function searchyStep(ds){
         el = matches[(counter = i < 0 ? i = matches.length - 1 : (i > matches.length - 1 ? 0 : i))],
         pos = findPos(el);
     
-    lastEl.className = (lastEl.className || "").replace(/(^|\s+)searchyActive(\s+|$)/g, '$1$2');
-    el.className += " searchyActive";
+    lastEl.className = (lastEl.className || "").replace(/(^|\s+)_searchyActive(\s+|$)/g, '$1$2');
+    el.className += " _searchyActive";
     if(!pos){ return };
     window.scrollTo(Math.max(pos[0] - 50, 0), Math.max(pos[1] - 50, 0));
     rePos();
@@ -263,42 +262,15 @@ function findNodeOccurrences(tNode){
     while((match = re.exec(s))){
         t = document.createTextNode(s.substring(idx, re.lastIndex - match[1].length));
         m = document.createElement('span');
+
+        m.className = '_searchyMatch';
+        m.textContent = match[1];
         
+        span.appendChild(t);
+        span.appendChild(m);
         
-        if (slow) {
-            m.className = '_searchyMatchSimple';
-            m.textContent = match[1];
-            
-            span.appendChild(t);
-            span.appendChild(m);
-            
-            idx = re.lastIndex;
-        }
-        else {
-            m.className = '_searchyMatch';
-            c = document.createElement('span');
-            c.textContent = match[1];
-            m.appendChild(c);
-            idx = re.lastIndex;
-            
-            span.appendChild(t);
-            span.appendChild(m);
-            
-            m.style.visibility = 'hidden';
-            m.style.position = 'absolute';
-            m.style.padding = '0px';
-            var before = c.style.padding;
-            c.style.padding = '0px';
-            
-            m.style.width = m.clientWidth + 'px';
-            m.style.height = m.clientHeight + 'px';
-            
-            m.style.visibility = 'visible';
-            m.style.position = 'relative';
-            c.style.padding = before;
-            
-            c.className = '_searchyMatchInner';
-        }
+        idx = re.lastIndex;
+        
         matches.push(m);
     }
     span.appendChild(document.createTextNode(s.substring(idx)));
