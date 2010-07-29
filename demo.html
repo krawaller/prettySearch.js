@@ -17,7 +17,9 @@
         <p>Otherwise, you'll have to get somewhat dirty. Bookmark this page on your iOS device. When it's saved, go in to your bookmarks list and edit the address. It will be quite long, since we've appended the bookmarklet to it. Your mission is to delete the # and everything before it. Tap and hold on the address field and scroll to the left until you see the #. Then delete everything before it. Now you're good to go!</p>
         <a href='javascript:(function(){var%20i=document.createElement("iframe");i.src="http://79.99.1.153/prettySearch.js/cache.html";i.style.position="absolute";i.style.left="-1000px";window.addEventListener("message",function(e){if(e.data.substring(0,1)==";"){eval(e.data);}%20else{var%20s=document.createElement("style");s.type="text/css";s.textContent=e.data;document.getElementsByTagName("head")[0].appendChild(s);}});document.body.appendChild(i);})()'>prettySearch.js</a>
         <script type="text/javascript">
-        	location.href += '#javascript:(function(){var%20i=document.createElement("iframe");i.src="http://79.99.1.153/prettySearch.js/cache.html";i.style.position="absolute";i.style.left="-1000px";window.addEventListener("message",function(e){if(e.data.substring(0,1)==";"){eval(e.data);}%20else{var%20s=document.createElement("style");s.type="text/css";s.textContent=e.data;document.getElementsByTagName("head")[0].appendChild(s);}});document.body.appendChild(i);})()';
+        	if (location.href.indexOf("#") == -1) {
+				location.href += '#javascript:(function(){var%20i=document.createElement("iframe");i.src="http://79.99.1.153/prettySearch.js/cache.html";i.style.position="absolute";i.style.left="-1000px";window.addEventListener("message",function(e){if(e.data.substring(0,1)==";"){eval(e.data);}%20else{var%20s=document.createElement("style");s.type="text/css";s.textContent=e.data;document.getElementsByTagName("head")[0].appendChild(s);}});document.body.appendChild(i);})()';
+			}
 		</script>
         
         <h2>Advanced</h2>
