@@ -110,7 +110,11 @@ searchyDoneButton.addEventListener('click', function(){
  * @param {Object} e
  */
 searchField.addEventListener('keyup', function(e){
-    find(this.value);
+	if(e.keyCode != 13){
+    	find(this.value);
+	} else {
+		searchyStep(1);
+	}
 }, false);
 
 /**
