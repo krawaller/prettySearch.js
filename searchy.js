@@ -1,5 +1,5 @@
 ;(function(){
-var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent);
+var iOS = /iPod|iPhone|iPad/.test(navigator.userAgent); // Yeak
 
 /**
  * PPK's utility functions
@@ -21,18 +21,11 @@ var $ = function(str){
     return document.getElementById(str);
 }, slice = Array.prototype.slice;
 
-var isHidden = false;
+var w, isHidden = false;
 if(!$('searchyBar')){
-    var s = document.createElement('link');
-    s.rel = 'stylesheet';
-    s.media = 'all';
-    s.href = 'http://79.99.1.153/prettySearch.js/searchy.css';
-    //s.href = 'searchy.css';
-    (document.getElementsByTagName('head') || [document.body])[0].appendChild(s);
-    
-    var w = document.createElement('div');
+    w = document.createElement('div');
     w.id = 'searchyWrapper';
-    //w.style.display = 'none';
+
     w.innerHTML = ['<div id="searchyBar">',
         '<button id="searchyDoneButton" class="_noMatch">Done</button>',
         '<div id="searchySearchFieldWrapper">',
@@ -45,13 +38,6 @@ if(!$('searchyBar')){
         '<div id="searchyMatchCounter" class="_noMatch">No matches</div>',
     '</div>'].join("\n");
     document.body.insertBefore(w, document.body.firstChild);
-    
-    /*var interval = setInterval(function(){
-        if(window.getComputedStyle(document.documentElement, null)['padding-top'] == '32px'){
-            wrapper.style.display = 'block';
-            clearInterval(interval);
-        }
-    }, 40);*/
 } else {
     isHidden = false;
 }
@@ -62,11 +48,9 @@ var scrolling = false,
     searchyMatchCounter = $('searchyMatchCounter'),
     searchField = $('searchySearchField'),
     searchyDoneButton = $('searchyDoneButton');
-    
-bar.style.display = 'block';
 
-if(!iOS){ bar.style.position = 'fixed'; }
-'html,head,style,title,link,meta,script,object,iframe,pre,a,'
+if(!iOS){ bar.style.position = 'fixed'; bar.style.right = '0px'; bar.style.left = 'auto'; }
+
 var nogo = ['HTML', 'HEAD', 'STYLE', 'TITLE', 'LINK', 'META', 'SCRIPT', 'OBJECT', 'IFRAME', 'PRE', 'OPTION'], re, rematchRe = /^\/([\s\S]+)\/(\w*)$/, hasSubGroup = /^[\S\s]*\([\S\s]+\)[\S\s]*$/;
 /**
  * Find textNodes containing str
@@ -307,6 +291,9 @@ function clearSearch(){
 }
 
 var cache = [], span, els, matches, counter;
+/**
+ * The function controlling the search flow
+ */
 function find(_str){
     if(_str === str){ return; }
     str = _str;
