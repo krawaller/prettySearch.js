@@ -315,5 +315,6 @@ function find(_str){
     
     chunk(els, findNodeOccurrences, null, 0, fns);
 }
-setTimeout(rePos, 0);
+setTimeout(function(){ rePos(); wrapper.style.display = 'block'; }, 0);
+
 })();
