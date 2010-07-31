@@ -1,6 +1,6 @@
 # prettySearch.js
 
-This is a bookmarklet for iOS devices which lets you search the current page using a search string or a Regular Expression. It highlights the matches and lets you jump between them, and the bar follows you around the page. Also, the search is carried out asynchronously, so your browser won't freeze. On top of this, it uses a new nifty caching system to work instantenously, even when offline.
+This is a bookmarklet for iOS devices which lets you search the current page using a search string or a Regular Expression. It highlights the matches and lets you jump between them, and the bar follows you around the page. Also, the search is carried out asynchronously, so your browser won't freeze. On top of this, it uses a new nifty caching system to work instantenously, even when offline, yet it is automatically updated whenever a new version is released.
 
 ### Advanced Usage
 
