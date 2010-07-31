@@ -39,7 +39,7 @@ if(!$('searchyBar')){
     '</div>'].join("\n");
     document.body.insertBefore(w, document.body.firstChild);
 } else {
-    isHidden = false;
+    $('searchyBar').style.display = 'block';
 }
 
 var scrolling = false,
