@@ -321,5 +321,4 @@ function find(_str){
 }
 rePos();
 setTimeout(function(){ wrapper.style.display = 'block'; }, 0);
-
 })();

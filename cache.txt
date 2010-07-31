@@ -1,2 +1,2 @@
-searchy.js
 searchy.css
+searchy.js
