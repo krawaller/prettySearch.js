@@ -70,6 +70,9 @@ function dfind(str){
         }
         try {
             re = new RegExp(reStr, modifiers.join(""));
+            if(re.test("")){ // Must not match empty string
+            	re = new RegExp("("+str+")", "gi");
+            }
         } catch(e){
             return [];
         }
